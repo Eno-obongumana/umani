@@ -6,8 +6,14 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "<h1>UMANI demo target</h1><a href='/search?q=hi'>search</a>"
-
+    return """
+    <h1>UMANI demo target</h1>
+    <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/search?q=hi">Search</a></li>
+    </ul>
+    """
 
 @app.route("/search")
 def search():
@@ -54,6 +60,31 @@ def admin_hidden():
 @app.route("/backup")
 def backup_hidden():
     return "backup files"
+
+@app.route("/about")
+def about():
+    return """
+    <h1>About</h1>
+    <a href="/contact">Contact</a>
+    <a href="/search?q=test">Search</a>
+    """
+
+
+@app.route("/contact")
+def contact():
+    return """
+    <h1>Contact</h1>
+    <form action="/submit" method="POST">
+        <input name="name">
+        <input name="message">
+        <button>Send</button>
+    </form>
+    """
+
+
+@app.route("/submit", methods=["POST"])
+def submit():
+    return "received"
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
