@@ -37,6 +37,14 @@ def cors_vuln():
     resp.headers["Access-Control-Allow-Credentials"] = "true"
     return resp
 
+from flask import redirect as flask_redirect
+
+
+@app.route("/redirect")
+def redirect_vuln():
+    # deliberately vulnerable: redirects to any user-supplied URL
+    target = request.args.get("url", "/")
+    return flask_redirect(target)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

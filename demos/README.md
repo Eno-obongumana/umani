@@ -9,7 +9,8 @@ bash demos/run-all.sh
 
 ## Demo matrix
 
-| Module  | Demo             | Target        | Proves                            |
-|---------|------------------|---------------|-----------------------------------|
-| headers | test_headers.py  | simple_flask  | Detects missing CSP, HSTS         |
-| cors    | test_cors.py     | simple_flask  | Detects origin reflection + creds |
+| Module        | Demo                   | Target        | Proves                            |
+|---------------|------------------------|---------------|-----------------------------------|
+| headers       | test_headers.py        | simple_flask  | Detects missing CSP, HSTS         |
+| cors          | test_cors.py           | simple_flask  | Detects origin reflection + creds |
+| open_redirect | test_open_redirect.py  | simple_flask  | Detects open redirect             |
