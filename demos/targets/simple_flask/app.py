@@ -135,5 +135,15 @@ def profile_update():
 @app.route("/password/change", methods=["POST"])
 def password_change():
     return "changed"
+
+@app.route("/lookup")
+def lookup():
+    # returns different content based on user input — perfect for fuzzing
+    name = request.args.get("name", "")
+    if name == "admin":
+        return "user found: admin (role=administrator)"
+    elif name:
+        return f"no user: {name}"
+    return "no user specified"
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

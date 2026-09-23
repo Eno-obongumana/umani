@@ -19,3 +19,4 @@ bash demos/run-all.sh
 | dir_brute     | test_dir_brute.py      | simple_flask  | Discovers hidden paths            |
 | spider        | test_spider.py         | simple_flask  | Crawls links and forms            |
 | csrf          | test_csrf.py           | simple_flask  | Finds unprotected POST forms      |
+| intruder      | test_intruder.py       | simple_flask  | Fuzzes params, flags anomalies    |

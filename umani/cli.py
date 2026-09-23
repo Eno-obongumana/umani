@@ -50,13 +50,26 @@ def scan(
         urls_to_scan = sorted(set(urls_to_scan + discovered))
         console.print(f"[dim]Discovered {len(urls_to_scan)} URLs[/dim]")
 
+    # Parse --module-option key=value pairs into a dict
+    options = {}
+    for kv in (module_option or []):
+        if "=" in kv:
+            k, v = kv.split("=", 1)
+            options[k] = v
+    # merge options into the module config
+    if options:
+        engine.options = {m: options for m in (module or engine.modules.keys())}
+
     findings = []
     for url in urls_to_scan:
         findings.extend(engine.scan(url, modules=module, scan_id=scan_id))
-
     if not findings:
         console.print("[green]No findings.[/green]")
         return
+
+    module_option: list[str] = typer.Option(
+        None, "--module-option", "-o",
+        help="key=value passed to module (e.g. param=name)"),
 
     t = Table("Severity", "Module", "Finding", "URL")
     for f in findings:
