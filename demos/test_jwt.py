@@ -1,6 +1,9 @@
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="jwt")
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="jwt")
+
 from umani.core.scope import Scope
 from umani.core.engine import Engine
 
