@@ -1,3 +1,5 @@
+from .core.proxy import Proxy
+
 from .core.repeater import Repeater
 
 import typer
@@ -182,6 +184,35 @@ def repeater(
     console.print()
     console.print("[bold]New response preview:[/bold]")
     console.print(new["body_preview"])
+
+@app.command()
+def proxy(
+    port: int = typer.Option(8080, "--port", "-p"),
+    db: Path = typer.Option("umani.db", "--db"),
+):
+    """Start an HTTP forward proxy that logs all traffic."""
+    store = Datastore(str(db))
+    scope = Scope()
+    p = Proxy(store, scope, host="127.0.0.1", port=port)
+    p.start()
+
+    console.print(f"[green]Proxy listening on[/green] http://127.0.0.1:{port}")
+    console.print()
+    console.print("Configure your browser to use this proxy:")
+    console.print(f"  HTTP proxy: [bold]127.0.0.1:{port}[/bold]")
+    console.print()
+    console.print("Or use curl:")
+    console.print(f"  [bold]curl -x http://127.0.0.1:{port} http://example.com/[/bold]")
+    console.print()
+    console.print("[dim]Press Ctrl+C to stop.[/dim]")
+
+    try:
+        while True:
+            import time
+            time.sleep(1)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Stopping proxy…[/yellow]")
+        p.stop()
 
 if __name__ == "__main__":
     app()
