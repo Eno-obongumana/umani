@@ -25,6 +25,17 @@ def user():
     # deliberately vulnerable: string-concatenated SQL
     cur = conn.execute(f"SELECT name FROM u WHERE id = {uid}")
     return str(cur.fetchall())
+from flask import make_response
+
+
+@app.route("/api/cors")
+def cors_vuln():
+    resp = make_response('{"user": "alice", "role": "admin"}')
+    origin = request.headers.get("Origin", "")
+    # deliberately vulnerable: reflect any Origin with credentials
+    resp.headers["Access-Control-Allow-Origin"] = origin
+    resp.headers["Access-Control-Allow-Credentials"] = "true"
+    return resp
 
 
 if __name__ == "__main__":
