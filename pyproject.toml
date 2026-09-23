@@ -1,0 +1,30 @@
+[project]
+name = "umani"
+version = "0.1.0"
+description = "UMANI — a modular web security testing framework"
+requires-python = ">=3.10"
+dependencies = [
+    "typer",
+    "httpx",
+    "beautifulsoup4",
+    "lxml",
+    "jinja2",
+    "rich",
+    "pyjwt",
+]
+
+[project.scripts]
+umani = "umani.cli:app"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["umani", "umani.core", "umani.modules"]
+
+[tool.setuptools.package-data]
+umani = ["payloads/*", "templates/*", "ca/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["demos", "tests"]
