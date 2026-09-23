@@ -46,5 +46,14 @@ def redirect_vuln():
     target = request.args.get("url", "/")
     return flask_redirect(target)
 
+@app.route("/admin")
+def admin_hidden():
+    return "admin panel"
+
+
+@app.route("/backup")
+def backup_hidden():
+    return "backup files"
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
