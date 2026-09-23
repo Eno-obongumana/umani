@@ -1,6 +1,6 @@
 [project]
 name = "umani"
-version = "0.1.0"
+version = "0.8.0"
 description = "UMANI — a modular web security testing framework"
 requires-python = ">=3.10"
 dependencies = [
@@ -12,6 +12,7 @@ dependencies = [
     "rich",
     "pyjwt",
     "pyyaml",
+    "cryptography",
 ]
 
 [project.scripts]
