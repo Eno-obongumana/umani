@@ -39,8 +39,6 @@ class Datastore:
         self.conn.executescript(SCHEMA)
         self.conn.commit()
 
-    # ---------- writes ----------
-
     def new_scan(self, target, options=None):
         cur = self.conn.execute(
             "INSERT INTO scans (target, options) VALUES (?, ?)",
@@ -76,65 +74,9 @@ class Datastore:
         self.conn.commit()
         return cur.lastrowid
 
-    # ---------- reads ----------
-
     def findings_for_scan(self, scan_id):
         cur = self.conn.execute(
             "SELECT module, name, severity, url, param, evidence, "
             "description, remediation FROM findings WHERE scan_id=?",
             (scan_id,))
         return cur.fetchall()
-
-    def get_finding(self, finding_id: int):
-        cur = self.conn.execute(
-            "SELECT id, scan_id, request_id, module, name, severity, url, "
-            "param, evidence, description, remediation, cvss "
-            "FROM findings WHERE id=?",
-            (finding_id,))
-        row = cur.fetchone()
-        if not row:
-            return None
-        cols = ["id", "scan_id", "request_id", "module", "name", "severity",
-                "url", "param", "evidence", "description", "remediation", "cvss"]
-        return dict(zip(cols, row))
-
-    def list_findings(self, scan_id: int):
-        cur = self.conn.execute(
-            "SELECT id, module, severity, name, url, param "
-            "FROM findings WHERE scan_id=? ORDER BY id",
-            (scan_id,))
-        cols = ["id", "module", "severity", "name", "url", "param"]
-        return [dict(zip(cols, row)) for row in cur.fetchall()]
-
-    def get_request(self, request_id: int):
-        cur = self.conn.execute(
-            "SELECT id, scan_id, method, url, headers, body "
-            "FROM requests WHERE id=?",
-            (request_id,))
-        row = cur.fetchone()
-        if not row:
-            return None
-        cols = ["id", "scan_id", "method", "url", "headers", "body"]
-        return dict(zip(cols, row))
-
-    def get_response_for_request(self, request_id: int):
-        cur = self.conn.execute(
-            "SELECT id, request_id, status, headers, body, elapsed_ms "
-            "FROM responses WHERE request_id=? ORDER BY id DESC LIMIT 1",
-            (request_id,))
-        row = cur.fetchone()
-        if not row:
-            return None
-        cols = ["id", "request_id", "status", "headers", "body", "elapsed_ms"]
-        return dict(zip(cols, row))
-
-    def get_scan(self, scan_id: int):
-        cur = self.conn.execute(
-            "SELECT id, target, started_at, finished_at, options "
-            "FROM scans WHERE id=?",
-            (scan_id,))
-        row = cur.fetchone()
-        if not row:
-            return None
-        cols = ["id", "target", "started_at", "finished_at", "options"]
-        return dict(zip(cols, row))

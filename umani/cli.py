@@ -1,3 +1,5 @@
+from .core.repeater import Repeater
+
 import typer
 from .core.reporter import Reporter
 from rich.console import Console
@@ -91,6 +93,95 @@ def report(
     console.print(f"[green]Report written to[/green] {path}")
     console.print(f"Open it with: [bold]xdg-open {path}[/bold]")
 
+@app.command()
+def findings(
+    scan_id: int = typer.Argument(..., help="Scan ID"),
+    db: Path = typer.Option("umani.db", "--db"),
+):
+    """List findings for a scan."""
+    store = Datastore(str(db))
+    rows = store.list_findings(scan_id)
+    if not rows:
+        console.print("[yellow]No findings for that scan.[/yellow]")
+        return
+
+    t = Table("ID", "Severity", "Module", "Finding", "URL")
+    for r in rows:
+        color = {"critical": "red", "high": "red", "medium": "yellow",
+                 "low": "cyan", "info": "white"}.get(r["severity"], "white")
+        t.add_row(str(r["id"]), f"[{color}]{r['severity']}[/{color}]",
+                  r["module"], r["name"], r["url"])
+    console.print(t)
+
+
+@app.command()
+def repeater(
+    finding_id: int = typer.Argument(..., help="Finding ID from `umani findings`"),
+    scope_file: Path = typer.Option("scope.yaml", "--scope"),
+    db: Path = typer.Option("umani.db", "--db"),
+    url: str = typer.Option(None, "--url", help="Override URL"),
+    method: str = typer.Option(None, "--method", "-X", help="Override method"),
+    body: str = typer.Option(None, "--body", help="Override body"),
+    param: list[str] = typer.Option(None, "--param", "-p",
+                                     help="Override query param key=value"),
+    header: list[str] = typer.Option(None, "--header", "-H",
+                                      help="Add header key=value"),
+):
+    """Replay and modify a stored request."""
+    scope = Scope(scope_file)
+    store = Datastore(str(db))
+    rep = Repeater(store, scope)
+
+    set_params = {}
+    for p in (param or []):
+        if "=" in p:
+            k, v = p.split("=", 1)
+            set_params[k] = v
+
+    add_headers = {}
+    for h in (header or []):
+        if ":" in h:
+            k, v = h.split(":", 1)
+            add_headers[k.strip()] = v.strip()
+
+    result = rep.replay(
+        finding_id,
+        override_url=url,
+        override_method=method,
+        override_body=body.encode() if body else None,
+        add_headers=add_headers or None,
+        set_params=set_params or None,
+    )
+
+    console.print(f"[bold]Finding:[/bold] {result['finding']['name']}")
+    console.print(f"[bold]Module:[/bold] {result['finding']['module']}")
+    console.print()
+
+    orig = result["original_response"]
+    new = result["new_response"]
+    orig_req = result["original_request"]
+
+    t = Table("", "Original", "New")
+    t.add_row("URL",
+              orig_req["url"] if orig_req else "—",
+              result["new_request"]["url"])
+    t.add_row("Method",
+              orig_req["method"] if orig_req else "—",
+              result["new_request"]["method"])
+    t.add_row("Status",
+              str(orig["status"]) if orig else "—",
+              str(new["status"]))
+    t.add_row("Length",
+              str(len(orig["body"])) if orig else "—",
+              str(new["length"]))
+    t.add_row("Time (ms)",
+              str(orig["elapsed_ms"]) if orig else "—",
+              str(new["elapsed_ms"]))
+    console.print(t)
+
+    console.print()
+    console.print("[bold]New response preview:[/bold]")
+    console.print(new["body_preview"])
 
 if __name__ == "__main__":
     app()

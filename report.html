@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>UMANI Report — http://127.0.0.1:5000/api/me</title>
+<title>UMANI Report — http://127.0.0.1:5000/profile</title>
 <style>
   body { font-family: -apple-system, system-ui, sans-serif; max-width: 1000px;
          margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; line-height: 1.5; }
@@ -39,42 +39,44 @@
 
 <h1>UMANI Security Report</h1>
 <div class="meta">
-  <div><strong>Target:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
-  <div><strong>Scan ID:</strong> 2</div>
-  <div><strong>Generated:</strong> 2026-09-23 16:24 UTC</div>
-  <div><strong>Total findings:</strong> 7</div>
+  <div><strong>Target:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
+  <div><strong>Scan ID:</strong> 3</div>
+  <div><strong>Generated:</strong> 2026-09-23 18:42 UTC</div>
+  <div><strong>Total findings:</strong> 8</div>
 </div>
 
 <h2>Executive Summary</h2>
 <div class="summary">
-  <div class="card critical"><div class="count">1</div><div class="label">Critical</div></div>
+  <div class="card critical"><div class="count">0</div><div class="label">Critical</div></div>
   <div class="card high"><div class="count">0</div><div class="label">High</div></div>
-  <div class="card medium"><div class="count">2</div><div class="label">Medium</div></div>
+  <div class="card medium"><div class="count">3</div><div class="label">Medium</div></div>
   <div class="card low"><div class="count">2</div><div class="label">Low</div></div>
-  <div class="card info"><div class="count">2</div><div class="label">Info</div></div>
+  <div class="card info"><div class="count">3</div><div class="label">Info</div></div>
 </div>
 
 <h2>Findings</h2>
 
 <div class="finding">
   <h3>
-    <span class="badge critical">critical</span>
-    JWT signed with weak secret
+    <span class="badge medium">medium</span>
+    CSRF: form at http://127.0.0.1:5000/profile/update missing token
   </h3>
-  <div><strong>Module:</strong> jwt</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
-  
-  <div><strong>CVSS:</strong> 9.1</div>
+  <div><strong>Module:</strong> csrf</div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile/update</span></div>
+  <div><strong>Parameter:</strong> email,bio</div>
+  <div><strong>CVSS:</strong> 6.5</div>
 
   <div class="section-label">Evidence</div>
-  <div class="evidence">Secret recovered: &#39;secret&#39;
-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
+  <div class="evidence">Form action: http://127.0.0.1:5000/profile/update
+Method: POST
+Inputs: [&#39;email&#39;, &#39;bio&#39;]
+No CSRF token field found.</div>
 
   <div class="section-label">Description</div>
-  <div>The JWT uses HS256 with a guessable secret. Anyone with the secret can forge tokens for any user or role.</div>
+  <div>This state-changing form does not include a CSRF token. An attacker can force a logged-in user&#39;s browser to submit this form silently.</div>
 
   <div class="section-label">Remediation</div>
-  <div>Use a long random secret (&gt;= 256 bits) or switch to RS256/ES256 with proper key management.</div>
+  <div>Include a per-session, unpredictable CSRF token in every state-changing form. Validate the token server-side before processing the request. Also set SameSite=Lax or Strict on session cookies.</div>
 </div>
 
 <div class="finding">
@@ -83,7 +85,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing Content-Security-Policy
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -103,7 +105,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing Strict-Transport-Security
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -123,7 +125,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing X-Frame-Options
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -143,7 +145,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing X-Content-Type-Options
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -163,7 +165,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing Referrer-Policy
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -183,7 +185,7 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
     Missing Permissions-Policy
   </h3>
   <div><strong>Module:</strong> headers</div>
-  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/api/me</span></div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile</span></div>
   
   
 
@@ -195,6 +197,28 @@ Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSIsInJ…</div>
 
   <div class="section-label">Remediation</div>
   <div>Set a Permissions-Policy restricting unused features.</div>
+</div>
+
+<div class="finding">
+  <h3>
+    <span class="badge info">info</span>
+    Form found: POST http://127.0.0.1:5000/profile/update
+  </h3>
+  <div><strong>Module:</strong> spider</div>
+  <div><strong>URL:</strong> <span class="url">http://127.0.0.1:5000/profile/update</span></div>
+  <div><strong>Parameter:</strong> email,bio</div>
+  
+
+  <div class="section-label">Evidence</div>
+  <div class="evidence">Form on http://127.0.0.1:5000/profile
+Method: POST
+Inputs: [&#39;email&#39;, &#39;bio&#39;]</div>
+
+  <div class="section-label">Description</div>
+  <div>HTML form discovered. Forms are candidate injection points for XSS, SQLi, and CSRF testing.</div>
+
+  <div class="section-label">Remediation</div>
+  <div>N/A — informational.</div>
 </div>
 
 
