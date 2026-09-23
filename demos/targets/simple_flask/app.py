@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template_string
 import sqlite3
 
+import jwt
+from datetime import datetime, timedelta, timezone
 app = Flask(__name__)
 
 
@@ -86,5 +88,17 @@ def contact():
 def submit():
     return "received"
 
+JWT_SECRET = "secret"   # deliberately weak
+
+@app.route("/api/me")
+def api_me():
+    # deliberately weak: HS256 with a guessable secret
+    payload = {
+        "sub": "alice",
+        "role": "admin",
+        "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    return {"token": token}
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
