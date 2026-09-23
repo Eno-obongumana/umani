@@ -100,5 +100,40 @@ def api_me():
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return {"token": token}
+
+@app.route("/profile")
+def profile():
+    # CSRF-vulnerable: no token
+    return """
+    <h1>Update Profile</h1>
+    <form action="/profile/update" method="POST">
+        <input name="email" value="alice@example.com">
+        <input name="bio" value="hello">
+        <button>Save</button>
+    </form>
+    """
+
+
+@app.route("/password")
+def password():
+    # CSRF-protected: includes a token
+    return """
+    <h1>Change Password</h1>
+    <form action="/password/change" method="POST">
+        <input type="hidden" name="csrf_token" value="abc123">
+        <input type="password" name="new_password">
+        <button>Change</button>
+    </form>
+    """
+
+
+@app.route("/profile/update", methods=["POST"])
+def profile_update():
+    return "updated"
+
+
+@app.route("/password/change", methods=["POST"])
+def password_change():
+    return "changed"
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

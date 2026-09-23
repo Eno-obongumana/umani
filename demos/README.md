@@ -18,3 +18,4 @@ bash demos/run-all.sh
 | sqli          | test_sqli.py           | simple_flask  | Detects SQL injection             |
 | dir_brute     | test_dir_brute.py      | simple_flask  | Discovers hidden paths            |
 | spider        | test_spider.py         | simple_flask  | Crawls links and forms            |
+| csrf          | test_csrf.py           | simple_flask  | Finds unprotected POST forms      |
