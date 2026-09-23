@@ -21,3 +21,4 @@ bash demos/run-all.sh
 | csrf          | test_csrf.py           | simple_flask  | Finds unprotected POST forms      |
 | intruder      | test_intruder.py       | simple_flask  | Fuzzes params, flags anomalies    |
 | (repeater)    | test_repeater.py       | simple_flask  | Replays findings with overrides   |
+| ssrf          | test_ssrf.py           | simple_flask  | Detects SSRF via canary callback  |

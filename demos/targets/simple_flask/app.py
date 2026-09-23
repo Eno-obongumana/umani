@@ -1,3 +1,5 @@
+import urllib.request
+
 from flask import Flask, request, render_template_string
 import sqlite3
 
@@ -145,5 +147,18 @@ def lookup():
     elif name:
         return f"no user: {name}"
     return "no user specified"
+
+
+@app.route("/fetch")
+def fetch():
+    # deliberately vulnerable: fetches any user-supplied URL server-side
+    target_url = request.args.get("url", "")
+    if not target_url:
+        return "no url"
+    try:
+        with urllib.request.urlopen(target_url, timeout=3) as r:
+            return r.read(500).decode("utf-8", errors="ignore")
+    except Exception as e:
+        return f"error: {e}"
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
