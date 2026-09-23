@@ -45,7 +45,7 @@ class SsrfModule(Module):
     def run(self, target: str) -> list[Finding]:
         findings = []
 
-        canary = Canary(host="127.0.0.1", port=9999)
+        canary = Canary(host="127.0.0.1",)
         canary.start()
 
         try:

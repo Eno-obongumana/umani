@@ -1,3 +1,6 @@
+import re
+import urllib.request
+
 import urllib.request
 
 from flask import Flask, request, render_template_string
@@ -160,5 +163,34 @@ def fetch():
             return r.read(500).decode("utf-8", errors="ignore")
     except Exception as e:
         return f"error: {e}"
+
+
+@app.route("/api/xml", methods=["POST"])
+def xml_parse():
+    # deliberately vulnerable: resolves external entities, including HTTP
+    body = request.get_data().decode("utf-8", errors="ignore")
+
+    # naive external entity resolution (the vulnerability)
+    entity_pattern = re.compile(
+        r'<!ENTITY\s+(\w+)\s+SYSTEM\s+"([^"]+)"\s*>')
+    entities = dict(entity_pattern.findall(body))
+
+    for name, uri in entities.items():
+        try:
+            if uri.startswith("file://"):
+                with open(uri[7:], "r") as f:
+                    value = f.read()
+            elif uri.startswith("http://") or uri.startswith("https://"):
+                with urllib.request.urlopen(uri, timeout=3) as r:
+                    value = r.read(2048).decode("utf-8", errors="ignore")
+            else:
+                value = ""
+        except Exception as e:
+           value = f"error: {e}"
+        body = body.replace(f"&{name};", value)
+
+    # strip the DOCTYPE now that entities are resolved
+    body = re.sub(r"<!DOCTYPE.*?\]>", "", body, flags=re.DOTALL)
+    return body
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

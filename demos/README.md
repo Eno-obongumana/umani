@@ -22,3 +22,4 @@ bash demos/run-all.sh
 | intruder      | test_intruder.py       | simple_flask  | Fuzzes params, flags anomalies    |
 | (repeater)    | test_repeater.py       | simple_flask  | Replays findings with overrides   |
 | ssrf          | test_ssrf.py           | simple_flask  | Detects SSRF via canary callback  |
+| xxe           | test_xxe.py            | simple_flask  | Detects XXE file disclosure + SSRF|
