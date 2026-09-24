@@ -1,3 +1,5 @@
+import logging
+
 import re
 import urllib.request
 
@@ -192,5 +194,26 @@ def xml_parse():
     # strip the DOCTYPE now that entities are resolved
     body = re.sub(r"<!DOCTYPE.*?\]>", "", body, flags=re.DOTALL)
     return body
+
+# A "logger" that simulates Log4Shell-style JNDI evaluation
+# The real CVE is Log4j; here we mimic its behavior for a safe demo.
+@app.route("/log")
+def log_endpoint():
+    ua = request.headers.get("User-Agent", "")
+    q = request.args.get("q", "")
+
+    # detect ${jndi:...} and "resolve" it via urllib — simulates Log4j
+    import re
+    import urllib.request
+    for value in (ua, q):
+        m = re.search(r"\$\{jndi:(?:ldap|rmi|dns)://([^}/]+)", value)
+        if m:
+            host = m.group(1)
+            try:
+                urllib.request.urlopen(f"http://{host}/", timeout=2)
+            except Exception:
+                pass
+    return "logged"
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

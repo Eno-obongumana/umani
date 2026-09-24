@@ -24,3 +24,4 @@ bash demos/run-all.sh
 | ssrf          | test_ssrf.py           | simple_flask  | Detects SSRF via canary callback  |
 | xxe           | test_xxe.py            | simple_flask  | Detects XXE file disclosure + SSRF|
 | (proxy)       | test_proxy.py          | simple_flask  | Logs proxied HTTP traffic         |
+| log4shell     | test_log4shell.py      | simple_flask  | Detects Log4Shell via canary      |
