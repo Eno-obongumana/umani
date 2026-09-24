@@ -31,3 +31,11 @@ docker run --rm --network host -p 8080:8080 umani proxy --port 8080
 
 # Persist state (DB, CA) across runs
 docker run --rm -v umani-data:/data umani scan http://127.0.0.1:5000/
+
+# UMANI
+
+[![test](https://github.com/YOUR-USER/umani/actions/workflows/test.yml/badge.svg)](https://github.com/YOUR-USER/umani/actions/workflows/test.yml)
+[![docker](https://github.com/YOUR-USER/umani/actions/workflows/docker.yml/badge.svg)](https://github.com/YOUR-USER/umani/actions/workflows/docker.yml)
+[![lint](https://github.com/YOUR-USER/umani/actions/workflows/lint.yml/badge.svg)](https://github.com/YOUR-USER/umani/actions/workflows/lint.yml)
+
+A modular web security testing framework.
