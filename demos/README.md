@@ -25,3 +25,4 @@ bash demos/run-all.sh
 | xxe           | test_xxe.py            | simple_flask  | Detects XXE file disclosure + SSRF|
 | (proxy)       | test_proxy.py          | simple_flask  | Logs proxied HTTP traffic         |
 | log4shell     | test_log4shell.py      | simple_flask  | Detects Log4Shell via canary      |
+| (passive)     | test_passive_scan.py   | simple_flask  | Proxy auto-scans every response   |

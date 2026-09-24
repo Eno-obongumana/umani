@@ -7,6 +7,7 @@ class Module(ABC):
     description: str = ""
     author: str = ""
     severity: str = "info"
+    module_type: str = "active"   # "active" | "passive"
 
     def __init__(self, requester, datastore, options: dict | None = None):
         self.http = requester
@@ -15,4 +16,5 @@ class Module(ABC):
 
     @abstractmethod
     def run(self, target: str) -> list[Finding]:
+        """Run the check against target. Return findings."""
         ...

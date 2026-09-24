@@ -49,6 +49,7 @@ class HeadersModule(Module):
     description = "Audit HTTP security headers"
     author = "you"
     severity = "medium"
+    module_type = "passive"
 
     def run(self, target: str) -> list[Finding]:
         req, res = self.http.get(target)

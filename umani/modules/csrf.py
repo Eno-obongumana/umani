@@ -20,6 +20,7 @@ class CsrfModule(Module):
     description = "Detect forms missing CSRF protection"
     author = "you"
     severity = "medium"
+    module_type = "passive"
 
     def _has_token(self, form) -> bool:
         for inp in form.find_all("input"):

@@ -15,6 +15,7 @@ class JwtModule(Module):
     description = "Detect JWT weaknesses (alg:none, weak secret, expiry)"
     author = "you"
     severity = "high"
+    module_type = "passive"
 
     def _load_secrets(self) -> list[str]:
         path = Path(__file__).parent.parent / "payloads" / "jwt_secrets.txt"

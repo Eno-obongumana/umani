@@ -5,9 +5,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import httpx
 from .models import Request, Response
 from .ca import CA
+from .plugin_loader import discover_passive_modules
+from .requester import Requester
 
 
 _CA = None
+_PASSIVE_MODULES = None
 
 
 def get_ca() -> CA:
@@ -15,6 +18,13 @@ def get_ca() -> CA:
     if _CA is None:
         _CA = CA()
     return _CA
+
+
+def _get_passive_modules():
+    global _PASSIVE_MODULES
+    if _PASSIVE_MODULES is None:
+        _PASSIVE_MODULES = discover_passive_modules()
+    return _PASSIVE_MODULES
 
 
 class _ProxyHandler(BaseHTTPRequestHandler):
@@ -46,6 +56,7 @@ class _ProxyHandler(BaseHTTPRequestHandler):
             return
 
         self._log(method, url, headers, body, resp)
+        self._passive_scan(url, method, headers, body, resp)
 
         self.send_response(resp.status_code)
         for k, v in resp.headers.items():
@@ -68,7 +79,6 @@ class _ProxyHandler(BaseHTTPRequestHandler):
     def do_CONNECT(self):
         host, _, port = self.path.partition(":")
         port = int(port or 443)
-
         self.send_response(200, "Connection Established")
         self.end_headers()
 
@@ -85,7 +95,7 @@ class _ProxyHandler(BaseHTTPRequestHandler):
             tls_client = ctx_server.wrap_socket(self.connection,
                                                  server_side=True)
         except ssl.SSLError as e:
-            print(f"[proxy] TLS handshake with browser failed for {host}: {e}")
+            print(f"[proxy] TLS handshake failed for {host}: {e}")
             return
 
         ctx_client = ssl.create_default_context()
@@ -111,7 +121,7 @@ class _ProxyHandler(BaseHTTPRequestHandler):
                     data = src.recv(65536)
                     if not data:
                         break
-                    if label == "b→s":
+                    if label == "b->s":
                         self._log_https(host, port, data)
                     dst.sendall(data)
             except Exception:
@@ -120,8 +130,8 @@ class _ProxyHandler(BaseHTTPRequestHandler):
                 try: dst.shutdown(socket.SHUT_WR)
                 except Exception: pass
 
-        t1 = threading.Thread(target=pump, args=(a, b, "b→s"), daemon=True)
-        t2 = threading.Thread(target=pump, args=(b, a, "s→b"), daemon=True)
+        t1 = threading.Thread(target=pump, args=(a, b, "b->s"), daemon=True)
+        t2 = threading.Thread(target=pump, args=(b, a, "s->b"), daemon=True)
         t1.start(); t2.start()
         t1.join(); t2.join()
         try: a.close()
@@ -163,6 +173,51 @@ class _ProxyHandler(BaseHTTPRequestHandler):
             self.datastore.save_response(res)
         except Exception as e:
             print(f"[proxy] logging failed: {e}")
+
+    def _passive_scan(self, url, method, headers, body, resp):
+        if self.datastore is None or self.scope is None:
+            return
+
+        def _run():
+            try:
+                requester = Requester(self.scope, self.datastore)
+                for name, cls in _get_passive_modules().items():
+                    try:
+                        mod = cls(requester, self.datastore)
+                        findings = _run_module_on_pair(
+                            mod, url, method, headers, body, resp)
+                        for f in findings:
+                            f.scan_id = f.scan_id or 0
+                            self.datastore.save_finding(f)
+                    except Exception as e:
+                        print(f"[passive] {name} failed: {e}")
+            except Exception as e:
+                print(f"[passive] outer error: {e}")
+
+        threading.Thread(target=_run, daemon=True).start()
+
+
+def _run_module_on_pair(module, url, method, headers, body, resp):
+    fake_req = Request(id=None, scan_id=0, method=method, url=url,
+                       headers=headers, body=body)
+    fake_res = Response(id=None, request_id=0, status=resp.status_code,
+                        headers=dict(resp.headers), body=resp.content,
+                        elapsed_ms=0)
+
+    class _FixedRequester:
+        def get(self, target, **kw):
+            return fake_req, fake_res
+        def post(self, target, **kw):
+            return fake_req, fake_res
+        def send(self, *a, **kw):
+            return fake_req, fake_res
+
+    module.http = _FixedRequester()
+    try:
+        return module.run(url)
+    except Exception as e:
+        print(f"[passive] module {module.name} raised: {e}")
+        return []
 
 
 class Proxy:

@@ -7,6 +7,8 @@ class CorsModule(Module):
     description = "Detect permissive CORS configurations"
     author = "you"
     severity = "medium"
+    module_type = "passive"
+    module_type = "passive"
 
     def run(self, target: str) -> list[Finding]:
         findings = []
