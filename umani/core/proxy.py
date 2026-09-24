@@ -7,6 +7,7 @@ from .models import Request, Response
 from .ca import CA
 from .plugin_loader import discover_passive_modules
 from .requester import Requester
+from .intercept import QUEUE
 
 
 _CA = None
@@ -32,6 +33,7 @@ class _ProxyHandler(BaseHTTPRequestHandler):
     scope = None
     client = None
     verbose = False
+    intercept = False
 
     def log_message(self, *args):
         if self.verbose:
@@ -48,6 +50,20 @@ class _ProxyHandler(BaseHTTPRequestHandler):
         headers = {k: v for k, v in self.headers.items()
                    if k.lower() not in ("host", "proxy-connection",
                                         "connection", "content-length")}
+
+        # --- intercept ---
+        if self.intercept:
+            print(f"[intercept] captured: {method} {url}")
+            item = QUEUE.submit(method, url, headers, body)
+            if item.action == "drop":
+                print(f"[intercept] dropped: {method} {url}")
+                self.send_error(403, "request dropped by UMANI intercept")
+                return
+            method = item.final_method()
+            url = item.final_url()
+            headers = item.final_headers()
+            body = item.final_body()
+
         try:
             resp = self.client.request(method, url, headers=headers,
                                         content=body)
@@ -222,13 +238,14 @@ def _run_module_on_pair(module, url, method, headers, body, resp):
 
 class Proxy:
     def __init__(self, datastore, scope, host="127.0.0.1", port=8080,
-                 verbose=False):
+                 verbose=False, intercept=False):
         self.host = host
         self.port = port
         self.datastore = datastore
         _ProxyHandler.datastore = datastore
         _ProxyHandler.scope = scope
         _ProxyHandler.verbose = verbose
+        _ProxyHandler.intercept = intercept
         _ProxyHandler.client = httpx.Client(
             timeout=20.0, follow_redirects=False, trust_env=False)
         self._server = ThreadingHTTPServer((host, port), _ProxyHandler)

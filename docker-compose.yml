@@ -1,0 +1,14 @@
+services:
+  umani:
+    build: .
+    image: umani:latest
+    container_name: umani
+    network_mode: host
+    volumes:
+      - umani-data:/data
+    stdin_open: true
+    tty: true
+    command: ["modules"]
+
+volumes:
+  umani-data:
