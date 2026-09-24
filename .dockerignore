@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtualenv
+venv/
+.venv/
+env/
+
+# Databases
+*.db
+*.sqlite
+
+# Test caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Generated CA (regenerated at runtime)
+umani/ca/*.pem
+umani/ca/*.key
+umani/ca/hosts/
+
+# Docs
+docs/
+*.md
+!README.md
