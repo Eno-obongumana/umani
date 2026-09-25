@@ -58,7 +58,6 @@ def scan(
         urls_to_scan = sorted(set(urls_to_scan + discovered))
         console.print(f"[dim]Discovered {len(urls_to_scan)} URLs[/dim]")
 
-    # Parse --module-option key=value pairs into a dict
     options = {}
     for kv in (module_option or []):
         if "=" in kv:
