@@ -1,3 +1,5 @@
+import uvicorn
+
 import time
 from pathlib import Path
 import typer
@@ -39,12 +41,17 @@ def scan(
     module_option: list[str] = typer.Option(
         None, "--module-option", "-o",
         help="key=value passed to module (e.g. param=name)"),
+    cookie: str = typer.Option(None, "--cookie", "-c",
+                                help="Cookie header (e.g. 'PHPSESSID=abc; security=low')"),
 ):
     """Scan a target URL."""
     scope = Scope(scope_file)
     store = Datastore(str(db))
     scan_id = store.new_scan(target, {"modules": module})
     engine = Engine(scope, store)
+
+    if cookie:
+        engine.requester.client.headers["Cookie"] = cookie
 
     console.print(f"[bold]Scanning[/bold] {target} (scan #{scan_id})")
 
@@ -289,6 +296,18 @@ def drop(item_id: int = typer.Argument(...)):
         console.print(f"[green]Dropped request {item_id}.[/green]")
     else:
         console.print(f"[red]No pending request with id {item_id}.[/red]")
+
+@app.command()
+def web(
+    host: str = typer.Option("127.0.0.1", "--host"),
+    port: int = typer.Option(8000, "--port", "-p"),
+):
+    """Start the UMANI web dashboard."""
+    from .web.app import create_app
+    console.print(f"[green]UMANI dashboard:[/green] http://{host}:{port}")
+    console.print(f"[dim]API docs:          http://{host}:{port}/api/docs[/dim]")
+    console.print("[dim]Press Ctrl+C to stop.[/dim]")
+    uvicorn.run(create_app(), host=host, port=port, log_level="warning")
 
 
 if __name__ == "__main__":

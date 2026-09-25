@@ -34,3 +34,14 @@ umani/ca/*.key
 umani/ca/*.pem
 umani/ca/*.key
 umani/ca/hosts/
+
+# Generated reports (scan output, not source)
+report.html
+report-*.html
+*-report.html
+*-finding.html
+umani.db
+report-*.html
+
+# Scan artifacts
+sqlite-*.db

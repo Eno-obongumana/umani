@@ -13,6 +13,9 @@ dependencies = [
     "pyjwt",
     "pyyaml",
     "cryptography",
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
 ]
 
 [project.scripts]

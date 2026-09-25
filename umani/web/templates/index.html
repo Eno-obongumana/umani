@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UMANI — Dashboard</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    margin: 0; background: #0f1115; color: #d4d4d8;
+    display: grid; grid-template-columns: 260px 1fr; min-height: 100vh;
+  }
+  aside {
+    background: #171a21; padding: 1.5rem; border-right: 1px solid #232733;
+    overflow-y: auto;
+  }
+  aside h2 { margin-top: 0; font-size: 1rem; text-transform: uppercase;
+             letter-spacing: 1px; color: #71717a; }
+  aside ul { list-style: none; padding: 0; margin: 0; }
+  aside li { padding: 6px 8px; border-radius: 4px; font-size: 0.85rem;
+             cursor: pointer; }
+  aside li:hover { background: #232733; }
+  main { padding: 2rem; overflow-y: auto; }
+  h1 { margin-top: 0; font-size: 1.5rem; }
+  .toolbar { display: flex; gap: .5rem; margin-bottom: 2rem;
+             flex-wrap: wrap; align-items: center; }
+  input[type="text"] {
+    background: #171a21; border: 1px solid #2d3340; color: #d4d4d8;
+    padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;
+    font-family: inherit; min-width: 280px;
+  }
+  input:focus { outline: 2px solid #3b82f6; border-color: transparent; }
+  button {
+    background: #3b82f6; color: white; border: 0; padding: 8px 16px;
+    border-radius: 6px; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+  }
+  button:hover { background: #2563eb; }
+  button.secondary { background: #232733; }
+  button.secondary:hover { background: #2d3340; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .findings { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .findings th { text-align: left; padding: 8px 10px; background: #171a21;
+                 color: #71717a; font-weight: 500;
+                 border-bottom: 1px solid #232733; }
+  .findings td { padding: 8px 10px; border-bottom: 1px solid #1b1f28;
+                 vertical-align: top; }
+  .findings tr:hover td { background: #171a21; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px;
+           font-size: 0.75rem; font-weight: 600; color: white;
+           text-transform: uppercase; }
+  .badge.critical { background: #7f1d1d; }
+  .badge.high { background: #b91c1c; }
+  .badge.medium { background: #b45309; }
+  .badge.low { background: #0369a1; }
+  .badge.info { background: #4b5563; }
+  .status { font-size: 0.85rem; color: #71717a; margin-left: 1rem; }
+  .empty { color: #52525b; padding: 2rem; text-align: center;
+           border: 1px dashed #2d3340; border-radius: 8px; }
+  .scan-item { padding: 6px 8px; font-size: 0.8rem; border-radius: 4px;
+               cursor: pointer; }
+  .scan-item:hover { background: #232733; }
+  .scan-item small { color: #52525b; display: block; }
+  .spinner { display: inline-block; width: 14px; height: 14px;
+             border: 2px solid #3b82f6; border-top-color: transparent;
+             border-radius: 50%; animation: spin 0.8s linear infinite;
+             vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<aside>
+  <h2>Modules</h2>
+  <ul id="modules"></ul>
+  <h2 style="margin-top:1.5rem;">Recent scans</h2>
+  <div id="scans"></div>
+</aside>
+
+<main>
+  <h1>UMANI Dashboard</h1>
+
+  <div class="toolbar">
+    <input type="text" id="target"
+           placeholder="http://127.0.0.1:5000/"
+           value="http://127.0.0.1:5000/">
+    <input type="text" id="cookie" placeholder="cookie (optional)"
+           style="min-width:220px;">
+    <button id="scan-btn" onclick="runScan()">Scan</button>
+    <button class="secondary" onclick="selectAll()">All</button>
+    <button class="secondary" onclick="selectNone()">None</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div id="results">
+    <div class="empty">No scan yet. Enter a target and click <b>Scan</b>.</div>
+  </div>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
