@@ -18,6 +18,13 @@ dependencies = [
     "pydantic",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "flask",
+]
+
 [project.scripts]
 umani = "umani.cli:app"
 

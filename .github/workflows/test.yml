@@ -29,13 +29,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libxml2 libxslt1-dev libssl-dev
 
-      - name: Install UMANI
+      - name: Install UMANI + dev deps
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -e .
+          pip install -e ".[dev]"
 
       - name: Install demo deps
         run: pip install flask
+
+      - name: Install test tools
+        run: pip install pytest pytest-cov
 
       - name: Run tests
         run: pytest demos/ -v
